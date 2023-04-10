@@ -1,4 +1,4 @@
-service: attendancebackend
+service: attendancebackendaws
 frameworkVersion: '3'
 
 provider:
@@ -15,7 +15,7 @@ provider:
           Action:
           - 'dynamodb:*'
           - 's3:*'
-          - rekognition:CompareFaces
+          - 'rekognition:CompareFaces'
 resources: 
   Resources:
     BilguunBucket:
@@ -64,7 +64,7 @@ functions:
     handler: handler/attendance.registerAttendance
     events:
       - http:
-          path: /
+          path: /registerAttendance
           method: POST
           cors: true
   compareFaces:
@@ -74,11 +74,11 @@ functions:
           path: /comparefaces
           method: POST
           cors: true
-      - s3:
-          bucket: zorigooleap3devattendance
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: targetimages/
+      # - s3:
+      #     bucket: zorigooleap3devattendance`
+      #     event: s3:ObjectCreated:*
+      #     rules:
+      #       - prefix: targetimages/
   getPresignedUrlToSourceImages:
     handler: handler/rekognition.getPresignedUrlToSourceImages
     events:
