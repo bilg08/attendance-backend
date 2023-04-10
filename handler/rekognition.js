@@ -2,6 +2,7 @@ const Aws = require('aws-sdk');
 const rekognition = new Aws.Rekognition();
 const s3 = new Aws.S3();
 const axios = require('axios');
+const { response: responseHttp } = require('../utils/response');
 module.exports.getPresignedUrlToSourceImages = async (event) => {
     const { email, ContentType } = JSON.parse(event.body);
     const ext = ContentType.split('/')[1];
@@ -12,17 +13,7 @@ module.exports.getPresignedUrlToSourceImages = async (event) => {
         ContentType: ContentType,
     };
     const preSignedUrl = s3.getSignedUrl('putObject', params);
-    return {
-        statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify(
-            {
-                url: preSignedUrl,
-            },
-        ),
-    };
+    return responseHttp(200, preSignedUrl);
 }
 module.exports.getPresignedUrlToTargetImages = async (event) => {
     const { email, ContentType } = JSON.parse(event.body);
@@ -34,17 +25,7 @@ module.exports.getPresignedUrlToTargetImages = async (event) => {
         ContentType: ContentType,
     };
     const preSignedUrl = s3.getSignedUrl('putObject', params);
-    return {
-        statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify(
-            {
-                url: preSignedUrl,
-            },
-        ),
-    };
+    return responseHttp(200, preSignedUrl);
 }
 
 module.exports.compareFaces = async (event) => {
@@ -64,49 +45,19 @@ module.exports.compareFaces = async (event) => {
         }
     }).promise();
     const { Similarity: similarity } = response?.FaceMatches[0];
+    //hervee tsarai adilahn baival
     if (similarity > 80) {
         try {
             await axios.post('https://uoa756xi8c.execute-api.us-east-1.amazonaws.com/dev/registerAttendance', {
                 email: email
             });
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                },
-                body: JSON.stringify({
-                    data: {
-                        success: true,
-                        message: 'amjilttai burtgelee'
-                    }
-                })
-            };
+            return responseHttp(200, 'amjilttai burtgelee');
         } catch (error) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                },
-                body: JSON.stringify({
-                    data: {
-                        success: false,
-                        message: 'Ta burtguulsen bain'
-                    }
-                })
-            };
+            //hervee hereglec ali hediin burtguulegdsen baival
+            return responseHttp(400, 'ta burtguulsen bain');
         }
     }else{
-        return {
-            statusCode: 400,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-            },
-            body: JSON.stringify({
-                data: {
-                    success: false,
-                    message: 'Ta bish baina'
-                }
-            })
-        };
+        //zyrag ogt adilhan bish baih uyd
+        return responseHttp(400, 'Ta bish baina');
     }
 }
