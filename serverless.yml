@@ -1,0 +1,95 @@
+service: attendancebackend
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Resource: "*"
+          Action: "lambda:InvokeFunction"
+        - Effect: "Allow"
+          Resource: "*"
+          Action:
+          - 'dynamodb:*'
+          - 's3:*'
+          - rekognition:CompareFaces
+resources: 
+  Resources:
+    BilguunBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: zorigooleap3devattendance
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+                - GET
+                - POST
+              AllowedOrigins:
+                - '*'
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref BilguunBucket
+        PolicyDocument:
+          Statement:
+            - Action:
+                - s3:PutObject
+                - s3:GetObject
+              Resource:
+                - arn:aws:s3:::zorigooleap3devattendance/*
+              Effect: Allow
+              Principal: "*"
+functions:
+  signin:
+    handler: handler/register.signin
+    events:
+      - http:
+          path: /signin
+          method: POST
+          cors: true
+  signup:
+    handler: handler/register.signup
+    events:
+      - http:
+          path: /signup
+          method: POST
+          cors: true
+  setattendance:
+    handler: handler/attendance.registerAttendance
+    events:
+      - http:
+          path: /
+          method: POST
+          cors: true
+  compareFaces:
+    handler: handler/rekognition.compareFaces
+    events:
+      - http:
+          path: /comparefaces
+          method: POST
+          cors: true
+      - s3:
+          bucket: zorigooleap3devattendance
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: targetimages/
+  getPresignedUrlToSourceImages:
+    handler: handler/rekognition.getPresignedUrlToSourceImages
+    events:
+      - http:
+          path: /getPresignedUrlToSourceImages
+          method: POST
+          cors: true
+  getPresignedUrlToTargetImages:
+    handler: handler/rekognition.getPresignedUrlToTargetImages
+    events:
+      - http:
+          path: /getPresignedUrlToTargetImages
+          method: POST
+          cors: true
