@@ -6,13 +6,14 @@ const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { hashPassword } = require('../utils/hashpassword');
-const { responseHttp: responseHttp } = require('../utils/response');
+const { response: responseHttp } = require('../utils/response');
 const s3 = new AWS.S3();
 const db = new DynamoDB();
 
 module.exports.signup = async (event) => {
     const { email, username, password } = JSON.parse(event.body);
     const hashedpassword = await hashPassword(password);
+    const id = uuidv4();
     try {
         const response = await db.putItem({
             TableName: 'users',
@@ -20,6 +21,7 @@ module.exports.signup = async (event) => {
                 email,
                 username,
                 hashedpassword,
+                id
             })
         });
         return responseHttp(200, response)

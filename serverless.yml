@@ -1,4 +1,4 @@
-service: attendancebackendaws
+service: attendancebackendawsleap3
 frameworkVersion: '3'
 
 provider:
@@ -21,7 +21,7 @@ resources:
     BilguunBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: zorigooleap3devattendance
+        BucketName: zorigooleap3devattendanceawsdev
         CorsConfiguration:
           CorsRules:
             - AllowedHeaders:
@@ -42,7 +42,7 @@ resources:
                 - s3:PutObject
                 - s3:GetObject
               Resource:
-                - arn:aws:s3:::zorigooleap3devattendance/*
+                - arn:aws:s3:::zorigooleap3devattendanceawsdev/*
               Effect: Allow
               Principal: "*"
 functions:
@@ -74,11 +74,11 @@ functions:
           path: /comparefaces
           method: POST
           cors: true
-      # - s3:
-      #     bucket: zorigooleap3devattendance`
-      #     event: s3:ObjectCreated:*
-      #     rules:
-      #       - prefix: targetimages/
+      - s3:
+          bucket: zorigooleap3devattendanceaws
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: targetimages/
   getPresignedUrlToSourceImages:
     handler: handler/rekognition.getPresignedUrlToSourceImages
     events:

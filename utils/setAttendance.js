@@ -2,7 +2,7 @@ const { DynamoDB } = require('@aws-sdk/client-dynamodb');
 const { marshall } = require('@aws-sdk/util-dynamodb');
 const { getCurrentMongoliaTimeDetail } = require('./getCurrentMongoliaTimeDetail');
 const db = new DynamoDB();
-module.exports.setAttendance = async (email) => {
+module.exports.setAttendance = async (id) => {
     const {
         mongoliaTimeNow,
         mongoliaTimeNowHour,
@@ -13,7 +13,7 @@ module.exports.setAttendance = async (email) => {
         await db.putItem({
             TableName: 'attendance',
             Item: marshall({
-                email,
+                userid: id,
                 createdAt: mongoliaTimeNow.toISOString(),
                 description: 'hotsorsongui',
                 createdDay: today
@@ -23,7 +23,7 @@ module.exports.setAttendance = async (email) => {
         await db.putItem({
             TableName: 'attendance',
             Item: marshall({
-                email,
+                userid: id,
                 createdAt: mongoliaTimeNow.toISOString(),
                 description: 'hotsorloo',
                 createdDay: today
