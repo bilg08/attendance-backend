@@ -5,7 +5,6 @@ const { checkIsUserRegisteredToday } = require('../utils/checkUserRegisteredToda
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const db = new DynamoDB();
 const {response: responseHttp} = require('../utils/response');
-
 module.exports.registerAttendance = async (event) => {
     // console.log(event.body);
     const { id } = JSON.parse(event.body);

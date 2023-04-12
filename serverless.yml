@@ -52,28 +52,44 @@ functions:
       - http:
           path: /signin
           method: POST
-          cors: true
+          cors: 
+            origin: 
+              - "http://localhost:3000"
+            headers:
+              - "*"
   signup:
     handler: handler/register.signup
     events:
       - http:
           path: /signup
           method: POST
-          cors: true
+          cors: 
+            origin: 
+              - "http://localhost:3000"
+            headers:
+              - "*"
   setattendance:
     handler: handler/attendance.registerAttendance
     events:
       - http:
           path: /registerAttendance
           method: POST
-          cors: true
+          cors: 
+            origin: 
+              - "http://localhost:3000"
+            headers:
+              - "*"
   compareFaces:
     handler: handler/rekognition.compareFaces
     events:
       - http:
           path: /comparefaces
           method: POST
-          cors: true
+          cors: 
+            origin: 
+              - "http://localhost:3000"
+            headers:
+              - "*"
       - s3:
           bucket: zorigooleap3devattendanceaws
           event: s3:ObjectCreated:*
@@ -85,11 +101,19 @@ functions:
       - http:
           path: /getPresignedUrlToSourceImages
           method: POST
-          cors: true
+          cors: 
+            origin: 
+              - "http://localhost:3000"
+            headers:
+              - "*"
   getPresignedUrlToTargetImages:
     handler: handler/rekognition.getPresignedUrlToTargetImages
     events:
       - http:
           path: /getPresignedUrlToTargetImages
           method: POST
-          cors: true
+          cors: 
+            origin: 
+              - "http://localhost:3000"
+            headers:
+              - "*"

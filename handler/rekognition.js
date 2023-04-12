@@ -14,7 +14,8 @@ module.exports.getPresignedUrlToSourceImages = async (event) => {
         ContentType: ContentType,
     };
     const preSignedUrl = s3.getSignedUrl('putObject', params);
-    return responseHttp(200, preSignedUrl);
+    return responseHttp(200, preSignedUrl)
+
 }
 module.exports.getPresignedUrlToTargetImages = async (event) => {
     const { id, ContentType } = JSON.parse(event.body);
@@ -25,7 +26,7 @@ module.exports.getPresignedUrlToTargetImages = async (event) => {
         ContentType: ContentType,
     };
     const preSignedUrl = s3.getSignedUrl('putObject', params);
-    return responseHttp(200, preSignedUrl);
+    return responseHttp(200, preSignedUrl)
 }
 
 module.exports.compareFaces = async (event) => {
@@ -56,7 +57,7 @@ module.exports.compareFaces = async (event) => {
     const isSimilarFace = similarity > 80;
     if (isSimilarFace) {
         try {
-            await axios.post('https://yzzv66kor7.execute-api.us-east-1.amazonaws.com/dev/registerAttendance', {
+            await axios.post('https://nuccbbgisl.execute-api.us-east-1.amazonaws.com/dev/registerAttendance', {
                 id: userid
             });
             console.log('amjilttai burtgelee');
