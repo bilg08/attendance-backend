@@ -7,15 +7,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { hashPassword } = require('../utils/hashpassword');
 const { response: responseHttp } = require('../utils/response');
-const s3 = new AWS.S3();
 const db = new DynamoDB();
 
 module.exports.signup = async (event) => {
     const { email, username, password } = JSON.parse(event.body);
     const hashedpassword = await hashPassword(password);
     const id = uuidv4();
-    try {
-        const response = await db.putItem({
+    const {Item: user} = await db.getItem({
+        TableName: 'users',
+        Key: marshall({
+            email: email
+        })
+    });
+    if(!user) {
+        await db.putItem({
             TableName: 'users',
             Item: marshall({
                 email,
@@ -24,9 +29,19 @@ module.exports.signup = async (event) => {
                 id
             })
         });
-        return responseHttp(200, response)
-    } catch (error) {
-        return responseHttp(400, error.message)
+        const {Item: newuser} = await db.getItem({
+            TableName: 'users',
+            Key: marshall({
+                email: email
+            })
+        });
+        const token = jwt.sign(newuser, 'hash');
+        return responseHttp(200, {
+            user: unmarshall(newuser),
+            token
+        })
+    }else{
+        return responseHttp(400, 'heregelegc burgegedsen baina')
     }
 }
 module.exports.signin = async (event) => {
@@ -38,8 +53,8 @@ module.exports.signin = async (event) => {
     const user = unmarshall(Item);
     const isPasswordRight = await bcrypt.compare(password, user.hashedpassword);
     if (isPasswordRight) {
-        const hashedUser = jwt.sign(user, 'hash');
-        return responseHttp(200, hashedUser)
+        const token = jwt.sign(user, 'hash');
+        return responseHttp(200, {user,token})
     } else {
         return responseHttp(405, `Invalid email or password`)
     }

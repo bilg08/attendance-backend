@@ -1,4 +1,4 @@
-service: attendancebackendawsleap3
+service: attendaws
 frameworkVersion: '3'
 
 provider:
@@ -12,16 +12,22 @@ provider:
           Action: "lambda:InvokeFunction"
         - Effect: "Allow"
           Resource: "*"
+          Action: "logs:DescribeLogStreams"
+        - Effect: "Allow"
+          Resource: "*"
+          Action: "logs:FilterLogEvents"
+        - Effect: "Allow"
+          Resource: "*"
           Action:
           - 'dynamodb:*'
           - 's3:*'
           - 'rekognition:CompareFaces'
 resources: 
   Resources:
-    BilguunBucket:
+    BilguunAtBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: zorigooleap3devattendanceawsdev
+        BucketName: attendacezorigbilgu30aws
         CorsConfiguration:
           CorsRules:
             - AllowedHeaders:
@@ -35,14 +41,14 @@ resources:
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
-        Bucket: !Ref BilguunBucket
+        Bucket: !Ref BilguunAtBucket
         PolicyDocument:
           Statement:
             - Action:
                 - s3:PutObject
                 - s3:GetObject
               Resource:
-                - arn:aws:s3:::zorigooleap3devattendanceawsdev/*
+                - arn:aws:s3:::attendacezorigbilgu30aws/*
               Effect: Allow
               Principal: "*"
 functions:
@@ -52,68 +58,52 @@ functions:
       - http:
           path: /signin
           method: POST
-          cors: 
-            origin: 
-              - "http://localhost:3000"
-            headers:
-              - "*"
+          cors: true
   signup:
     handler: handler/register.signup
     events:
       - http:
           path: /signup
           method: POST
-          cors: 
-            origin: 
-              - "http://localhost:3000"
-            headers:
-              - "*"
+          cors: true
   setattendance:
     handler: handler/attendance.registerAttendance
     events:
       - http:
           path: /registerAttendance
           method: POST
-          cors: 
-            origin: 
-              - "http://localhost:3000"
-            headers:
-              - "*"
+          cors: true
   compareFaces:
     handler: handler/rekognition.compareFaces
     events:
       - http:
           path: /comparefaces
           method: POST
-          cors: 
-            origin: 
-              - "http://localhost:3000"
-            headers:
-              - "*"
+          cors: true
       - s3:
-          bucket: zorigooleap3devattendanceaws
+          bucket: attendacezorigbilgu30aws
           event: s3:ObjectCreated:*
           rules:
             - prefix: targetimages/
+          existing: true
   getPresignedUrlToSourceImages:
     handler: handler/rekognition.getPresignedUrlToSourceImages
     events:
       - http:
           path: /getPresignedUrlToSourceImages
           method: POST
-          cors: 
-            origin: 
-              - "http://localhost:3000"
-            headers:
-              - "*"
+          cors: true
   getPresignedUrlToTargetImages:
     handler: handler/rekognition.getPresignedUrlToTargetImages
     events:
       - http:
           path: /getPresignedUrlToTargetImages
           method: POST
-          cors: 
-            origin: 
-              - "http://localhost:3000"
-            headers:
-              - "*"
+          cors: true
+  getCompareFaceResult:
+    handler: handler/rekognition.getCompareFaceResult
+    events:
+      - http:
+          path: /getResult
+          method: POST
+          cors: true

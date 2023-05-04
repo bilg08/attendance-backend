@@ -8,10 +8,10 @@ const {response: responseHttp} = require('../utils/response');
 module.exports.registerAttendance = async (event) => {
     // console.log(event.body);
     const { id } = JSON.parse(event.body);
-    // console.log(id,'id');
+    console.log(id,'id');
     const { today } = getCurrentMongoliaTimeDetail();
     const isRegisteredToday = await checkIsUserRegisteredToday(id, today);
-    console.log(isRegisteredToday)
+    console.log(isRegisteredToday,'isRegisteredToday')
     if (!isRegisteredToday) {
         await setAttendance(id);
         return responseHttp(200, 'amjilttai')
